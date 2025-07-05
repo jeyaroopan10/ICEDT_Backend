@@ -11,6 +11,6 @@ namespace ICEDT.API.Models
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
-        public string? ProfileImage { get; set; }
+        public string ?ProfileImage { get; set; }
     }
 }

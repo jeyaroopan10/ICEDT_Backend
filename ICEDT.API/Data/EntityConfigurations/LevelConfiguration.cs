@@ -1,4 +1,6 @@
-
+using ICEDT.API.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ICEDT.API.Data.EntityConfigurations
 {

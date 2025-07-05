@@ -8,8 +8,8 @@ namespace ICEDT.API.Models
         [Key]
         public int ActivityTypeId { get; set; }
         [Required]
-        public string ActivityName { get; set; }
+        public string Name { get; set; }
 
-        public ICollection<Activity> Activities { get; set; }
+        public ICollection<Activity> ?Activities { get; set; }
     }
 } 
