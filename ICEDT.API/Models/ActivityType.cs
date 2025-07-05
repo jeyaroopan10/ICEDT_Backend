@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace ICEDT_backend_mono.Models
+namespace ICEDT.API.Models
 {
     public class ActivityType
     {

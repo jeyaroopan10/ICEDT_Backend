@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ICEDT_backend_mono.Models
+namespace ICEDT.API.Models
 {
     public class Activity
     {
