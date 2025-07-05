@@ -1,4 +1,5 @@
 using ICEDT.API.Extensions;
+using ICEDT.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,7 @@ app.UseRouting();
 
 app.UseAuthentication(); // Add authentication middleware
 app.UseAuthorization();
+app.UseWrapResponseMiddleware();
 
 app.MapControllerRoute(
     name: "default",
