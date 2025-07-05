@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35828.75 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICEDT.API", "ICEDT.API\ICEDT.API.csproj", "{59F3468E-32EB-46A0-BB85-5EF5F4F61572}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59F3468E-32EB-46A0-BB85-5EF5F4F61572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59F3468E-32EB-46A0-BB85-5EF5F4F61572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59F3468E-32EB-46A0-BB85-5EF5F4F61572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59F3468E-32EB-46A0-BB85-5EF5F4F61572}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {090EA46B-DB75-4CC1-AEA3-D81414D0D8BA}
+	EndGlobalSection
+EndGlobal

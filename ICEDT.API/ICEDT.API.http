@@ -1,0 +1,6 @@
+@ICEDT.API_HostAddress = http://localhost:5242
+
+GET {{ICEDT.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
