@@ -1,8 +1,8 @@
-
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using ICEDT.API.Models;
 
-namespace ICEDT.API.Repositories.Interfaces       
+namespace ICEDT.API.Repositories.Interfaces
 {
     public interface IActivityTypeRepository
     {
@@ -11,5 +11,6 @@ namespace ICEDT.API.Repositories.Interfaces
         Task AddAsync(ActivityType activityType);
         Task UpdateAsync(ActivityType activityType);
         Task DeleteAsync(int id);
+        Task<bool> ActivityTypeExistsAsync(int activityTypeId);
     }
-} 
+}

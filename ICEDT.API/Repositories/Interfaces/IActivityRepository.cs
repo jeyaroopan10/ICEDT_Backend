@@ -10,5 +10,7 @@ namespace ICEDT.API.Repositories.Interfaces
         Task AddAsync(Activity activity);
         Task UpdateAsync(Activity activity);
         Task DeleteAsync(int id);
+        Task<bool> SequenceOrderExistsAsync(int sequenceOrder);
+        Task<bool> LessonExistsAsync(int lessonId);
     }
-} 
+}

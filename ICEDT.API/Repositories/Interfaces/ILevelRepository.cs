@@ -1,5 +1,5 @@
-
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using ICEDT.API.Models;
 
 namespace ICEDT.API.Repositories.Interfaces
@@ -13,5 +13,6 @@ namespace ICEDT.API.Repositories.Interfaces
         Task DeleteAsync(int id);
         Task<Level> GetByIdWithLessonsAsync(int id);
         Task<List<Level>> GetAllWithLessonsAsync();
+        Task<bool> SequenceOrderExistsAsync(int sequenceOrder);
     }
 }

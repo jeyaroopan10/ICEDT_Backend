@@ -1,7 +1,12 @@
-﻿using System.Security.Authentication;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
-
-
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using System.Security.Authentication;
 
 namespace ICEDT.API.Middleware
 {
@@ -97,7 +102,16 @@ namespace ICEDT.API.Middleware
                     exception.GetType().Name,
                     StatusCodes.Status404NotFound
                 ),
-
+                DbUpdateException dbEx when dbEx.InnerException is SqlException sqlEx && sqlEx.Number == 2601 => (
+                    "Duplicate sequence order detected.",
+                    "DuplicateSequenceOrderException",
+                    StatusCodes.Status400BadRequest
+                ),
+                DbUpdateException => (
+                    "A database update error occurred.",
+                    "DbUpdateException",
+                    StatusCodes.Status400BadRequest
+                ),
                 _ => (
                     "An unexpected error occurred.",
                     exception.GetType().Name,
@@ -106,9 +120,9 @@ namespace ICEDT.API.Middleware
             };
 
             var extensions = new Dictionary<string, object?>
-                {
-                    { "traceId", context.TraceIdentifier }
-                };
+            {
+                { "traceId", context.TraceIdentifier }
+            };
 
             if (exception is ValidationException validationException)
             {
@@ -133,16 +147,19 @@ namespace ICEDT.API.Middleware
                 return false;
 
             var fileTypes = new List<string>
-                {
-                    "application/pdf",
-                    "image/jpeg",
-                    "image/png",
-                    "image/gif"
-                };
+            {
+                "application/pdf",
+                "image/jpeg",
+                "image/png",
+                "image/gif"
+            };
 
             return fileTypes.Contains(contentType);
         }
     }
+
+
+
 
     public static class WrapResponseMiddlewareExtensions
     {

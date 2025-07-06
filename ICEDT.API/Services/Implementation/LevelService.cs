@@ -1,15 +1,12 @@
-
-
-using ICEDT.API.DTO.Request;
-using ICEDT.API.DTO.Response;
-using ICEDT.API.Middleware;
 using ICEDT.API.Models;
+using ICEDT.API.Middleware;
 using ICEDT.API.Repositories.Interfaces;
 using ICEDT.API.Services.Interfaces;
+using ICEDT.API.DTO.Request;
+using ICEDT.API.DTO.Response;
 
 namespace ICEDT.API.Services.Implementation
 {
-
     public class LevelService : ILevelService
     {
         private readonly ILevelRepository _repo;
@@ -33,6 +30,23 @@ namespace ICEDT.API.Services.Implementation
         public async Task<LevelResponseDto> AddLevelAsync(LevelRequestDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.LevelName)) throw new BadRequestException("Level name is required.");
+            if (dto.SequenceOrder <= 0) throw new BadRequestException("Sequence order must be a positive number.");
+
+            if (await _repo.SequenceOrderExistsAsync(dto.SequenceOrder))
+                throw new BadRequestException($"Sequence order {dto.SequenceOrder} is already in use.");
+
+            /*
+            var existingLevels = await _repo.GetAllAsync();
+            if (existingLevels.Any(l => l.SequenceOrder == dto.SequenceOrder))
+            {
+                foreach (var level in existingLevels.Where(l => l.SequenceOrder >= dto.SequenceOrder))
+                {
+                    level.SequenceOrder++;
+                    await _repo.UpdateAsync(level);
+                }
+            }
+            */
+
             var level = new Level
             {
                 LevelName = dto.LevelName,
@@ -45,8 +59,34 @@ namespace ICEDT.API.Services.Implementation
         public async Task UpdateLevelAsync(int id, LevelRequestDto dto)
         {
             if (id <= 0) throw new BadRequestException("Invalid Level ID.");
+            if (string.IsNullOrWhiteSpace(dto.LevelName)) throw new BadRequestException("Level name is required.");
+            if (dto.SequenceOrder <= 0) throw new BadRequestException("Sequence order must be a positive number.");
+
             var level = await _repo.GetByIdAsync(id);
             if (level == null) throw new NotFoundException("Level not found.");
+
+       
+            if (level.SequenceOrder != dto.SequenceOrder)
+            {
+                if (await _repo.SequenceOrderExistsAsync(dto.SequenceOrder))
+                    throw new BadRequestException($"Sequence order {dto.SequenceOrder} is already in use.");
+            }
+
+            /* 
+            if (level.SequenceOrder != dto.SequenceOrder)
+            {
+                var existingLevels = await _repo.GetAllAsync();
+                if (existingLevels.Any(l => l.SequenceOrder == dto.SequenceOrder && l.LevelId != id))
+                {
+                    foreach (var existingLevel in existingLevels.Where(l => l.SequenceOrder >= dto.SequenceOrder && l.LevelId != id))
+                    {
+                        existingLevel.SequenceOrder++;
+                        await _repo.UpdateAsync(existingLevel);
+                    }
+                }
+            }
+            */
+
             level.LevelName = dto.LevelName;
             level.SequenceOrder = dto.SequenceOrder;
             await _repo.UpdateAsync(level);
@@ -55,6 +95,8 @@ namespace ICEDT.API.Services.Implementation
         public async Task DeleteLevelAsync(int id)
         {
             if (id <= 0) throw new BadRequestException("Invalid Level ID.");
+            var level = await _repo.GetByIdAsync(id);
+            if (level == null) throw new NotFoundException("Level not found.");
             await _repo.DeleteAsync(id);
         }
 

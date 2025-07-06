@@ -1,13 +1,12 @@
-using ICEDT.API.Data;
-using ICEDT.API.Models;
-using ICEDT.API.Repositories.Interfaces;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-
+using ICEDT.API.Models;
+using ICEDT.API.Data;
+using ICEDT.API.Repositories.Interfaces;
 
 namespace ICEDT.API.Repositories.Implementation
 {
-    
-
     public class ActivityRepository : IActivityRepository
     {
         private readonly ApplicationDbContext _context;
@@ -18,11 +17,14 @@ namespace ICEDT.API.Repositories.Implementation
             await _context.Activities.FindAsync(id);
 
         public async Task<List<Activity>> GetAllAsync() =>
-            await _context.Activities.ToListAsync();
+            await _context.Activities
+                .OrderBy(a => a.SequenceOrder)
+                .ToListAsync();
 
         public async Task<List<Activity>> GetByLessonIdAsync(int lessonId) =>
             await _context.Activities
                 .Where(a => a.LessonId == lessonId)
+                .OrderBy(a => a.SequenceOrder)
                 .ToListAsync();
 
         public async Task AddAsync(Activity activity)
@@ -46,5 +48,11 @@ namespace ICEDT.API.Repositories.Implementation
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<bool> SequenceOrderExistsAsync(int sequenceOrder) =>
+            await _context.Activities.AnyAsync(a => a.SequenceOrder == sequenceOrder);
+
+        public async Task<bool> LessonExistsAsync(int lessonId) =>
+            await _context.Lessons.AnyAsync(l => l.LessonId == lessonId);
     }
 }

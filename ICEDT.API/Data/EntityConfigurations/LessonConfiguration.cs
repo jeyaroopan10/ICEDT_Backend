@@ -22,6 +22,8 @@ namespace ICEDT.API.Data.EntityConfigurations
                    .WithOne(a => a.Lesson)
                    .HasForeignKey(a => a.LessonId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(l => l.SequenceOrder).IsUnique();
         }
     }
 } 
