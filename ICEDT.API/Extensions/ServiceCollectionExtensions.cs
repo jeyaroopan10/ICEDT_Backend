@@ -12,6 +12,7 @@ namespace ICEDT.API.Extensions
             services.ConfigureAuthorizationPolicies();
             services.AddSwaggerAndMvc(configuration);
             services.AddAppServices();
+            services.AddRepositories();
             return services;
         }
 
