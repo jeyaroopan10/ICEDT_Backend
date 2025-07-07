@@ -65,7 +65,7 @@ namespace ICEDT.API.Services.Implementation
             var level = await _repo.GetByIdAsync(id);
             if (level == null) throw new NotFoundException("Level not found.");
 
-       
+
             if (level.SequenceOrder != dto.SequenceOrder)
             {
                 if (await _repo.SequenceOrderExistsAsync(dto.SequenceOrder))
@@ -106,6 +106,12 @@ namespace ICEDT.API.Services.Implementation
             if (string.IsNullOrWhiteSpace(dto.LessonName)) throw new BadRequestException("Lesson name is required.");
             var level = await _repo.GetByIdWithLessonsAsync(levelId);
             if (level == null) throw new NotFoundException("Level not found.");
+
+            if (level.Lessons?.Any(l => l.LessonName == dto.LessonName) == true)
+                throw new ConflictException("A lesson with the same name already exists in this level.");
+            if (level.Lessons?.Any(l => l.SequenceOrder == dto.SequenceOrder) == true)
+                throw new ConflictException("A lesson with the same SequenceOrder already exists.");
+
             var lesson = new Lesson
             {
                 LevelId = levelId,
@@ -113,9 +119,11 @@ namespace ICEDT.API.Services.Implementation
                 Description = dto.Description,
                 SequenceOrder = dto.SequenceOrder
             };
+
             level.Lessons ??= new List<Lesson>();
             level.Lessons.Add(lesson);
             await _repo.UpdateAsync(level);
+
             return new LessonResponseDto
             {
                 LessonId = lesson.LessonId,
@@ -125,6 +133,7 @@ namespace ICEDT.API.Services.Implementation
                 SequenceOrder = lesson.SequenceOrder
             };
         }
+
 
         public async Task RemoveLessonFromLevelAsync(int levelId, int lessonId)
         {
