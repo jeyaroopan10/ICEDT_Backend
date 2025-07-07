@@ -6,7 +6,7 @@ namespace ICEDT.API.Repositories.Interfaces
     {
         Task<Activity> GetByIdAsync(int id);
         Task<List<Activity>> GetAllAsync();
-        Task<List<Activity>> GetByLessonIdAsync(int lessonId);
+        Task<List<Activity>> GetByLessonIdAsync(int lessonId, int? activitytypeid);
         Task AddAsync(Activity activity);
         Task UpdateAsync(Activity activity);
         Task DeleteAsync(int id);

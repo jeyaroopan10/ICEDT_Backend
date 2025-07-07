@@ -21,7 +21,13 @@ namespace ICEDT.API.Repositories.Implementation
                 .OrderBy(a => a.SequenceOrder)
                 .ToListAsync();
 
-        public async Task<List<Activity>> GetByLessonIdAsync(int lessonId) =>
+        public async Task<List<Activity>> GetByLessonIdAsync(int lessonId, int? activitytypeid) =>   
+            activitytypeid.HasValue
+                ? await _context.Activities
+                    .Where(a => a.LessonId == lessonId && a.ActivityTypeId == activitytypeid.Value)
+                    .OrderBy(a => a.SequenceOrder)
+                    .ToListAsync()
+                :
             await _context.Activities
                 .Where(a => a.LessonId == lessonId)
                 .OrderBy(a => a.SequenceOrder)

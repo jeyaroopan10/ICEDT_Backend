@@ -33,12 +33,12 @@ namespace ICEDT.API.Services.Implementation
             return activities.Select(MapToActivityResponseDto).ToList();
         }
 
-        public async Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId)
+        public async Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId ,int ? activitytypeid)
         {
-            if (lessonId <= 0) throw new BadRequestException("Invalid Lesson ID.");
+          
             var lessonExists = await _activityRepo.LessonExistsAsync(lessonId);
             if (!lessonExists) throw new NotFoundException("Lesson not found.");
-            var activities = await _activityRepo.GetByLessonIdAsync(lessonId);
+            var activities = await _activityRepo.GetByLessonIdAsync(lessonId, activitytypeid);
             return activities.Select(MapToActivityResponseDto).ToList();
         }
 

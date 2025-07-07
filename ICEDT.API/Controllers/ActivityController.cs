@@ -30,12 +30,17 @@ namespace ICEDT.API.Controllers
             return Ok(activities);
         }
 
-        [HttpGet("by-lesson/{lessonId}")]
-        public async Task<IActionResult> GetActivitiesByLessonId(int lessonId)
+
+        [HttpGet("by-lesson/{lessonId}/{activitytypeid?}")]
+        public async Task<IActionResult> GetActivitiesByLessonId(int lessonId, int? activitytypeid)
         {
             if (lessonId <= 0)
                 return BadRequest(new { message = "Invalid Lesson ID." });
-            var activities = await _service.GetActivitiesByLessonIdAsync(lessonId);
+            if (activitytypeid <= 0 && activitytypeid == null)
+                return BadRequest(new { message = "Invalid Activity Type ID." });
+
+
+            var activities = await _service.GetActivitiesByLessonIdAsync(lessonId, activitytypeid);
             return Ok(activities);
         }
 
