@@ -47,7 +47,6 @@ namespace ICEDT.API.Repositories.Implementation
         {
             return await _context.Levels
                 .Include(l => l.Lessons)
-                .ThenInclude(ls => ls) // Ensure Lessons are included
                 .Where(l => l.LevelId == id)
                 .OrderBy(l => l.SequenceOrder)
                 .FirstOrDefaultAsync();

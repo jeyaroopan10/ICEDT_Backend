@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using System.Security.Authentication;
@@ -102,6 +97,11 @@ namespace ICEDT.API.Middleware
                     exception.GetType().Name,
                     StatusCodes.Status404NotFound
                 ),
+                ConflictException => (
+                    exception.Message,
+                    exception.GetType().Name,
+                    StatusCodes.Status400BadRequest
+                ),
                 DbUpdateException dbEx when dbEx.InnerException is SqlException sqlEx && sqlEx.Number == 2601 => (
                     "Duplicate sequence order detected.",
                     "DuplicateSequenceOrderException",
@@ -113,7 +113,7 @@ namespace ICEDT.API.Middleware
                     StatusCodes.Status400BadRequest
                 ),
                 _ => (
-                    "An unexpected error occurred.",
+                    exception.Message ?? "An error occurred while processing your request.",
                     exception.GetType().Name,
                     StatusCodes.Status500InternalServerError
                 )
