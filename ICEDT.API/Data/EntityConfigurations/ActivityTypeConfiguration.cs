@@ -8,13 +8,19 @@ namespace ICEDT.API.Data.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<ActivityType> builder)
         {
-            builder.HasKey(at => at.ActivityTypeId);
-            builder.Property(at => at.Name).IsRequired();
+            builder.HasKey(t => t.ActivityTypeId);
+            builder.Property(t => t.Name).IsRequired().HasMaxLength(50);
+            builder.Property(t => t.MainActivityTypeId).IsRequired();
 
-            builder.HasMany(at => at.Activities)
+            builder.HasOne(t => t.MainActivityType)
+                   .WithMany(m => m.ActivityTypes)
+                   .HasForeignKey(t => t.MainActivityTypeId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(t => t.Activities)
                    .WithOne(a => a.ActivityType)
                    .HasForeignKey(a => a.ActivityTypeId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
-} 
+}

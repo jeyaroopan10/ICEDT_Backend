@@ -23,6 +23,8 @@ namespace ICEDT.API.Models
         public Lesson Lesson { get; set; }
         [ForeignKey("ActivityTypeId")]
         public ActivityType ActivityType { get; set; }
+
+
      
     }
 } 
