@@ -33,12 +33,25 @@ namespace ICEDT.API.Services.Implementation
             return activities.Select(MapToActivityResponseDto).ToList();
         }
 
-        public async Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId ,int ? activitytypeid)
+        public async Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId, int? activitytypeid, int? mainactivitytypeid)
         {
-          
             var lessonExists = await _activityRepo.LessonExistsAsync(lessonId);
             if (!lessonExists) throw new NotFoundException("Lesson not found.");
             var activities = await _activityRepo.GetByLessonIdAsync(lessonId, activitytypeid);
+            if (mainactivitytypeid.HasValue)
+            {
+                // Filter activities by MainActivityTypeId
+                var filtered = new List<Activity>();
+                foreach (var activity in activities)
+                {
+                    var activityType = await _typeRepo.GetByIdAsync(activity.ActivityTypeId);
+                    if (activityType != null && activityType.MainActivityTypeId == mainactivitytypeid.Value)
+                    {
+                        filtered.Add(activity);
+                    }
+                }
+                activities = filtered;
+            }
             return activities.Select(MapToActivityResponseDto).ToList();
         }
 
@@ -182,11 +195,14 @@ namespace ICEDT.API.Services.Implementation
         // Mapping helpers
         private ActivityResponseDto MapToActivityResponseDto(Activity activity)
         {
+            // Fetch ActivityType to get MainActivityTypeId
+            var activityType = _typeRepo.GetByIdAsync(activity.ActivityTypeId).Result;
             return new ActivityResponseDto
             {
                 ActivityId = activity.ActivityId,
                 LessonId = activity.LessonId,
                 ActivityTypeId = activity.ActivityTypeId,
+                MainActivityTypeId = activityType != null ? activityType.MainActivityTypeId : 0,
                 Title = activity.Title,
                 SequenceOrder = activity.SequenceOrder,
                 ContentJson = activity.ContentJson
@@ -198,7 +214,8 @@ namespace ICEDT.API.Services.Implementation
             return new ActivityTypeResponseDto
             {
                 ActivityTypeId = type.ActivityTypeId,
-                ActivityName = type.Name
+                ActivityName = type.Name,
+                MainActivityTypeId = type.MainActivityTypeId
             };
         }
     }

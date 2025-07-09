@@ -31,16 +31,14 @@ namespace ICEDT.API.Controllers
         }
 
 
-        [HttpGet("by-lesson/{lessonId}/{activitytypeid?}")]
-        public async Task<IActionResult> GetActivitiesByLessonId(int lessonId, int? activitytypeid)
+        [HttpGet("by-lesson/{lessonId}/{activitytypeid?}/{mainactivitytypeid?}")]
+        public async Task<IActionResult> GetActivitiesByLessonId(int lessonId, int? activitytypeid, int? mainactivitytypeid)
         {
             if (lessonId <= 0)
                 return BadRequest(new { message = "Invalid Lesson ID." });
-            if (activitytypeid <= 0 && activitytypeid == null)
-                return BadRequest(new { message = "Invalid Activity Type ID." });
+            // activitytypeid and mainactivitytypeid are optional, so no need to check for <= 0
 
-
-            var activities = await _service.GetActivitiesByLessonIdAsync(lessonId, activitytypeid);
+            var activities = await _service.GetActivitiesByLessonIdAsync(lessonId, activitytypeid, mainactivitytypeid);
             return Ok(activities);
         }
 

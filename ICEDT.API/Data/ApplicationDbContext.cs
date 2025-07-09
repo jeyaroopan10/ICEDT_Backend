@@ -16,6 +16,7 @@ namespace ICEDT.API.Data
         public DbSet<Lesson> Lessons { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<ActivityType> ActivityTypes { get; set; }
+        public DbSet<MainActivityType> MainActivityTypes { get; set; }
 
     }
 }

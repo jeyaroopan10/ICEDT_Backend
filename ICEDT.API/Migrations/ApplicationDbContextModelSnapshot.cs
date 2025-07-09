@@ -225,7 +225,7 @@ namespace ICEDT.API.Migrations
 
                     b.HasKey("MainActivityTypeId");
 
-                    b.ToTable("MainActivityType");
+                    b.ToTable("MainActivityTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>

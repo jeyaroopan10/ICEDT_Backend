@@ -6,24 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ICEDT.API.Migrations
 {
     /// <inheritdoc />
-    public partial class first : Migration
+    public partial class last1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "ActivityTypes",
-                columns: table => new
-                {
-                    ActivityTypeId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ActivityTypes", x => x.ActivityTypeId);
-                });
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -80,6 +67,19 @@ namespace ICEDT.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Levels", x => x.LevelId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MainActivityTypes",
+                columns: table => new
+                {
+                    MainActivityTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MainActivityTypes", x => x.MainActivityTypeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -211,6 +211,26 @@ namespace ICEDT.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ActivityTypes",
+                columns: table => new
+                {
+                    ActivityTypeId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MainActivityTypeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ActivityTypes", x => x.ActivityTypeId);
+                    table.ForeignKey(
+                        name: "FK_ActivityTypes_MainActivityTypes_MainActivityTypeId",
+                        column: x => x.MainActivityTypeId,
+                        principalTable: "MainActivityTypes",
+                        principalColumn: "MainActivityTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Activities",
                 columns: table => new
                 {
@@ -220,7 +240,8 @@ namespace ICEDT.API.Migrations
                     ActivityTypeId = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SequenceOrder = table.Column<int>(type: "int", nullable: false),
-                    ContentJson = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ContentJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MainActivityTypeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -237,6 +258,11 @@ namespace ICEDT.API.Migrations
                         principalTable: "Lessons",
                         principalColumn: "LessonId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Activities_MainActivityTypes_MainActivityTypeId",
+                        column: x => x.MainActivityTypeId,
+                        principalTable: "MainActivityTypes",
+                        principalColumn: "MainActivityTypeId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -248,6 +274,16 @@ namespace ICEDT.API.Migrations
                 name: "IX_Activities_LessonId",
                 table: "Activities",
                 column: "LessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Activities_MainActivityTypeId",
+                table: "Activities",
+                column: "MainActivityTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ActivityTypes_MainActivityTypeId",
+                table: "ActivityTypes",
+                column: "MainActivityTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -326,6 +362,9 @@ namespace ICEDT.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "MainActivityTypes");
 
             migrationBuilder.DropTable(
                 name: "Levels");
