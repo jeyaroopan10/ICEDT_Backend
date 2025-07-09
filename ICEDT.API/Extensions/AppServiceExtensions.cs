@@ -11,6 +11,10 @@ namespace ICEDT.API.Extensions
             services.AddScoped<ILevelService, LevelService>();
             services.AddScoped<IActivityService, ActivityService>();
 
+            // AWS S3 client and MediaService registration
+            services.AddAWSService<Amazon.S3.IAmazonS3>();
+            services.AddScoped<IMediaService, MediaService>();
+
             return services;
         }
     }
