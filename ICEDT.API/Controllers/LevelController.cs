@@ -1,9 +1,9 @@
 
 
 using ICEDT.API.DTO.Request;
+using ICEDT.API.Models;
 using ICEDT.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 
 namespace ICEDT.API.Controllers
 {
@@ -43,6 +43,8 @@ namespace ICEDT.API.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] LevelRequestDto dto)
         {
+            if (id <= 0)
+                return BadRequest(new { message = "Invalid Level ID." });
             await _service.UpdateLevelAsync(id, dto);
             return NoContent();
         }
@@ -51,6 +53,8 @@ namespace ICEDT.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
+            if (id <= 0)
+                return BadRequest(new { message = "Invalid Level ID." });
             await _service.DeleteLevelAsync(id);
             return NoContent();
         }
@@ -59,6 +63,8 @@ namespace ICEDT.API.Controllers
         [HttpPost("{levelId:int}/lessons")]
         public async Task<IActionResult> AddLesson(int levelId, [FromBody] LessonRequestDto dto)
         {
+            if (levelId <= 0)
+                return BadRequest(new { message = "Invalid Level ID." });
             var lesson = await _service.AddLessonToLevelAsync(levelId, dto);
             return CreatedAtAction(nameof(GetLevelWithLessons), new { levelId }, lesson);
         }
@@ -66,6 +72,8 @@ namespace ICEDT.API.Controllers
         [HttpDelete("{levelId:int}/lessons/{lessonId:int}")]
         public async Task<IActionResult> RemoveLesson(int levelId, int lessonId)
         {
+            if (levelId <= 0 || lessonId <= 0)
+                    return BadRequest(new { message = "Invalid  ID." });
             await _service.RemoveLessonFromLevelAsync(levelId, lessonId);
             return NoContent();
         }

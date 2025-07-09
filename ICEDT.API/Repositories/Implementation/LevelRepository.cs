@@ -14,10 +14,13 @@ namespace ICEDT.API.Repositories.Implementation
         public LevelRepository(ApplicationDbContext context) => _context = context;
 
         public async Task<Level> GetByIdAsync(int id) =>
-            await _context.Levels.FindAsync(id);
+            await _context.Levels
+                .Include(l => l.Lessons)
+                .FirstOrDefaultAsync(l => l.LevelId == id);
 
         public async Task<List<Level>> GetAllAsync() =>
             await _context.Levels
+                .Include(l => l.Lessons)
                 .OrderBy(l => l.SequenceOrder)
                 .ToListAsync();
 
@@ -54,10 +57,17 @@ namespace ICEDT.API.Repositories.Implementation
 
         public async Task<List<Level>> GetAllWithLessonsAsync()
         {
-            return await _context.Levels
+            var levels = await _context.Levels
+                .Include(l => l.Lessons)
                 .OrderBy(l => l.SequenceOrder)
-                .Include(l => l.Lessons.OrderBy(ls => ls.SequenceOrder))
                 .ToListAsync();
+            // Sort child lessons in-memory
+            foreach (var level in levels)
+            {
+                if (level.Lessons != null)
+                    level.Lessons = level.Lessons.OrderBy(ls => ls.SequenceOrder).ToList();
+            }
+            return levels;
         }
 
         public async Task<bool> SequenceOrderExistsAsync(int sequenceOrder) =>

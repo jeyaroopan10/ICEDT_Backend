@@ -1,8 +1,7 @@
 using ICEDT.API.DTO.Request;
 using ICEDT.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using ICEDT.API.DTO.Response;
+using ICEDT.API.Middleware;
 
 
 namespace ICEDT.API.Controllers
@@ -15,21 +14,18 @@ namespace ICEDT.API.Controllers
 
         public ActivitiesController(IActivityService service) => _service = service;
 
-
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0)
-                return BadRequest(new { message = "Invalid Activity ID." });
+                throw new BadRequestException("Invalid Activity ID.");
             var activity = await _service.GetActivityAsync(id);
             return Ok(activity);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
             => Ok(await _service.GetAllActivitiesAsync());
-
 
         [HttpGet("by-lesson")]
         public async Task<IActionResult> GetActivitiesByLessonId(
@@ -38,11 +34,10 @@ namespace ICEDT.API.Controllers
             [FromQuery] int? mainActivityTypeId)
         {
             if (lessonId <= 0)
-                return BadRequest(new { message = "Invalid Lesson ID." });
+                throw new BadRequestException("Invalid Lesson ID.");
             var activities = await _service.GetActivitiesByLessonIdAsync(lessonId, activityTypeId, mainActivityTypeId);
             return Ok(activities);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ActivityRequestDto dto)
@@ -51,10 +46,11 @@ namespace ICEDT.API.Controllers
             return CreatedAtAction(nameof(Get), new { id = activity.ActivityId }, activity);
         }
 
-
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] ActivityRequestDto dto)
         {
+            if (id <= 0)
+                throw new BadRequestException("Invalid Activity ID.");
             await _service.UpdateActivityAsync(id, dto);
             return NoContent();
         }
@@ -62,6 +58,8 @@ namespace ICEDT.API.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
+            if (id <= 0)
+                throw new BadRequestException("Invalid Activity ID.");
             await _service.DeleteActivityAsync(id);
             return NoContent();
         }
@@ -72,11 +70,10 @@ namespace ICEDT.API.Controllers
         public async Task<IActionResult> GetType(int id)
         {
             if (id <= 0)
-                return BadRequest(new { message = "Invalid ActivityType ID." });
+                throw new BadRequestException("Invalid ActivityType ID.");
             var type = await _service.GetActivityTypeAsync(id);
             return Ok(type);
         }
-
 
         [HttpGet("types")]
         public async Task<IActionResult> GetAllTypes()
@@ -92,10 +89,11 @@ namespace ICEDT.API.Controllers
             return CreatedAtAction(nameof(GetType), new { id = type.ActivityTypeId }, type);
         }
 
-
         [HttpPut("types/{id:int}")]
         public async Task<IActionResult> UpdateType(int id, [FromBody] ActivityTypeRequestDto dto)
         {
+            if (id <= 0)
+                throw new BadRequestException("Invalid ActivityType ID.");
             await _service.UpdateActivityTypeAsync(id, dto);
             return NoContent();
         }
@@ -103,6 +101,8 @@ namespace ICEDT.API.Controllers
         [HttpDelete("types/{id:int}")]
         public async Task<IActionResult> DeleteType(int id)
         {
+            if (id <= 0)
+                throw new BadRequestException("Invalid ActivityType ID.");
             await _service.DeleteActivityTypeAsync(id);
             return NoContent();
         }

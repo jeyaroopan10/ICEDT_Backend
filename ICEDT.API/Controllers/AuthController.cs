@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace ICEDT.API.Controllers
 {
 
-    [Route("api/auth")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -20,10 +20,7 @@ namespace ICEDT.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+           
 
             var (success, token, errorMessage) = await _authService.LoginAsync(loginDto);
             if (!success)
@@ -37,10 +34,7 @@ namespace ICEDT.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        
 
             var (success, errorMessage) = await _authService.RegisterAsync(registerDto);
             if (!success)
