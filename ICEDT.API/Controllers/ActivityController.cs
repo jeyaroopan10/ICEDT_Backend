@@ -1,20 +1,22 @@
 using ICEDT.API.DTO.Request;
 using ICEDT.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using ICEDT.API.DTO.Response;
 
 
 namespace ICEDT.API.Controllers
 {
     [ApiController]
-    [Route("api/activities")]
-    public class ActivityController : ControllerBase
+    [Route("api/[controller]")]
+    public class ActivitiesController : ControllerBase
     {
         private readonly IActivityService _service;
 
-        public ActivityController(IActivityService service) => _service = service;
+        public ActivitiesController(IActivityService service) => _service = service;
 
-        // Activity CRUD
-        [HttpGet("{id}")]
+
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0)
@@ -23,44 +25,41 @@ namespace ICEDT.API.Controllers
             return Ok(activity);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
-        {
-            var activities = await _service.GetAllActivitiesAsync();
-            return Ok(activities);
-        }
+            => Ok(await _service.GetAllActivitiesAsync());
 
 
-        [HttpGet("by-lesson/{lessonId}/{activitytypeid?}/{mainactivitytypeid?}")]
-        public async Task<IActionResult> GetActivitiesByLessonId(int lessonId, int? activitytypeid, int? mainactivitytypeid)
+        [HttpGet("by-lesson")]
+        public async Task<IActionResult> GetActivitiesByLessonId(
+            [FromQuery] int lessonId,
+            [FromQuery] int? activityTypeId,
+            [FromQuery] int? mainActivityTypeId)
         {
             if (lessonId <= 0)
                 return BadRequest(new { message = "Invalid Lesson ID." });
-            // activitytypeid and mainactivitytypeid are optional, so no need to check for <= 0
-
-            var activities = await _service.GetActivitiesByLessonIdAsync(lessonId, activitytypeid, mainactivitytypeid);
+            var activities = await _service.GetActivitiesByLessonIdAsync(lessonId, activityTypeId, mainActivityTypeId);
             return Ok(activities);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ActivityRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid request data.", errors = ModelState });
             var activity = await _service.AddActivityAsync(dto);
             return CreatedAtAction(nameof(Get), new { id = activity.ActivityId }, activity);
         }
 
-        [HttpPut("{id}")]
+
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] ActivityRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid request data.", errors = ModelState });
             await _service.UpdateActivityAsync(id, dto);
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
             await _service.DeleteActivityAsync(id);
@@ -68,7 +67,8 @@ namespace ICEDT.API.Controllers
         }
 
         // ActivityType CRUD
-        [HttpGet("types/{id}")]
+
+        [HttpGet("types/{id:int}")]
         public async Task<IActionResult> GetType(int id)
         {
             if (id <= 0)
@@ -76,6 +76,7 @@ namespace ICEDT.API.Controllers
             var type = await _service.GetActivityTypeAsync(id);
             return Ok(type);
         }
+
 
         [HttpGet("types")]
         public async Task<IActionResult> GetAllTypes()
@@ -87,22 +88,19 @@ namespace ICEDT.API.Controllers
         [HttpPost("types")]
         public async Task<IActionResult> CreateType([FromBody] ActivityTypeRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid request data.", errors = ModelState });
             var type = await _service.AddActivityTypeAsync(dto);
             return CreatedAtAction(nameof(GetType), new { id = type.ActivityTypeId }, type);
         }
 
-        [HttpPut("types/{id}")]
+
+        [HttpPut("types/{id:int}")]
         public async Task<IActionResult> UpdateType(int id, [FromBody] ActivityTypeRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Invalid request data.", errors = ModelState });
             await _service.UpdateActivityTypeAsync(id, dto);
             return NoContent();
         }
 
-        [HttpDelete("types/{id}")]
+        [HttpDelete("types/{id:int}")]
         public async Task<IActionResult> DeleteType(int id)
         {
             await _service.DeleteActivityTypeAsync(id);
