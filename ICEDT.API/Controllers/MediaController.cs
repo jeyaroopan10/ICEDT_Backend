@@ -1,8 +1,6 @@
 using ICEDT.API.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+using ICEDT.API.DTO.Requst;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace ICEDT.API.Controllers
 {
@@ -11,65 +9,50 @@ namespace ICEDT.API.Controllers
     public class MediaController : ControllerBase
     {
         private readonly IMediaService _mediaService;
+
         public MediaController(IMediaService mediaService)
         {
             _mediaService = mediaService;
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload( IFormFile file, [FromForm] string folder)
+        public async Task<IActionResult> Upload(MediaUploadRequestDto request)
         {
-            try
-            {
-                var key = await _mediaService.UploadAsync(file, folder);
-                return Ok(new { key });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            var result = await _mediaService.UploadAsync(request);
+            return Ok(result);
         }
 
         [HttpDelete("{key}")]
         public async Task<IActionResult> Delete(string key)
         {
-            try
-            {
-                await _mediaService.DeleteAsync(key);
-                return Ok(new { message = "Deleted successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            if (string.IsNullOrEmpty(key))
+                return BadRequest(new { message = "Key is required." });
+
+            await _mediaService.DeleteAsync(key);
+            return NoContent();
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> List([FromQuery] string folder)
+        public async Task<IActionResult> List([FromQuery] string folder = "")
         {
-            try
-            {
-                var keys = await _mediaService.ListAsync(folder);
-                return Ok(keys);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+            var result = await _mediaService.ListAsync(folder);
+            return Ok(result);
         }
 
         [HttpGet("url")]
         public async Task<IActionResult> GetPresignedUrl([FromQuery] string key, [FromQuery] int expiryMinutes = 60)
         {
-            try
+            if (string.IsNullOrEmpty(key))
+                return BadRequest(new { message = "Key is required." });
+
+            var request = new MediaUrlRequestDto
             {
-                var url = await _mediaService.GetPresignedUrlAsync(key, expiryMinutes);
-                return Ok(new { url });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { error = ex.Message });
-            }
+                Key = key,
+                ExpiryMinutes = expiryMinutes
+            };
+
+            var result = await _mediaService.GetPresignedUrlAsync(request);
+            return Ok(result);
         }
     }
-} 
+}

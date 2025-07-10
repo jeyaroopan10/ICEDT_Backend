@@ -1,4 +1,5 @@
-﻿using ICEDT.API.Services.Implementation;
+﻿using Amazon.S3;
+using ICEDT.API.Services.Implementation;
 using ICEDT.API.Services.Interfaces;
 
 namespace ICEDT.API.Extensions
@@ -12,7 +13,7 @@ namespace ICEDT.API.Extensions
             services.AddScoped<IActivityService, ActivityService>();
 
             // AWS S3 client and MediaService registration
-            services.AddAWSService<Amazon.S3.IAmazonS3>();
+            services.AddAWSService<IAmazonS3>(); // Uses AWS SDK's credential provider chain
             services.AddScoped<IMediaService, MediaService>();
 
             return services;
