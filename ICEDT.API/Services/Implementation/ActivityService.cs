@@ -21,7 +21,6 @@ namespace ICEDT.API.Services.Implementation
         // Activity CRUD
         public async Task<ActivityResponseDto> GetActivityAsync(int id)
         {
-            if (id <= 0) throw new BadRequestException("Invalid Activity ID.");
             var activity = await _activityRepo.GetByIdAsync(id);
             if (activity == null) throw new NotFoundException("Activity not found.");
             return MapToActivityResponseDto(activity);
@@ -33,22 +32,16 @@ namespace ICEDT.API.Services.Implementation
             return activities.Select(MapToActivityResponseDto).ToList();
         }
 
-        public async Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId)
+        public async Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId, int? activitytypeid, int? mainactivitytypeid)
         {
-            if (lessonId <= 0) throw new BadRequestException("Invalid Lesson ID.");
             var lessonExists = await _activityRepo.LessonExistsAsync(lessonId);
             if (!lessonExists) throw new NotFoundException("Lesson not found.");
-            var activities = await _activityRepo.GetByLessonIdAsync(lessonId);
+            var activities = await _activityRepo.GetByLessonIdAsync(lessonId, activitytypeid, mainactivitytypeid);
             return activities.Select(MapToActivityResponseDto).ToList();
         }
 
         public async Task<ActivityResponseDto> AddActivityAsync(ActivityRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Title)) throw new BadRequestException("Title is required.");
-            if (dto.LessonId <= 0) throw new BadRequestException("Invalid Lesson ID.");
-            if (dto.ActivityTypeId <= 0) throw new BadRequestException("Invalid Activity Type ID.");
-            if (dto.SequenceOrder <= 0) throw new BadRequestException("Sequence order must be a positive number.");
-
             var lessonExists = await _activityRepo.LessonExistsAsync(dto.LessonId);
             if (!lessonExists) throw new NotFoundException("Lesson not found.");
             var typeExists = await _typeRepo.ActivityTypeExistsAsync(dto.ActivityTypeId);
@@ -84,12 +77,6 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task UpdateActivityAsync(int id, ActivityRequestDto dto)
         {
-            if (id <= 0) throw new BadRequestException("Invalid Activity ID.");
-            if (dto.LessonId <= 0) throw new BadRequestException("Invalid Lesson ID.");
-            if (dto.ActivityTypeId <= 0) throw new BadRequestException("Invalid Activity Type ID.");
-            if (string.IsNullOrWhiteSpace(dto.Title)) throw new BadRequestException("Title is required.");
-            if (dto.SequenceOrder <= 0) throw new BadRequestException("Sequence order must be a positive number.");
-
             var activity = await _activityRepo.GetByIdAsync(id);
             if (activity == null) throw new NotFoundException("Activity not found.");
 
@@ -130,7 +117,6 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task DeleteActivityAsync(int id)
         {
-            if (id <= 0) throw new BadRequestException("Invalid Activity ID.");
             var activity = await _activityRepo.GetByIdAsync(id);
             if (activity == null) throw new NotFoundException("Activity not found.");
             await _activityRepo.DeleteAsync(id);
@@ -139,7 +125,6 @@ namespace ICEDT.API.Services.Implementation
         // ActivityType CRUD
         public async Task<ActivityTypeResponseDto> GetActivityTypeAsync(int id)
         {
-            if (id <= 0) throw new BadRequestException("Invalid ActivityType ID.");
             var type = await _typeRepo.GetByIdAsync(id);
             if (type == null) throw new NotFoundException("ActivityType not found.");
             return MapToActivityTypeResponseDto(type);
@@ -153,7 +138,6 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task<ActivityTypeResponseDto> AddActivityTypeAsync(ActivityTypeRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.ActivityName)) throw new BadRequestException("ActivityType name is required.");
             var type = new ActivityType { Name = dto.ActivityName };
             await _typeRepo.AddAsync(type);
             return MapToActivityTypeResponseDto(type);
@@ -161,8 +145,7 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task UpdateActivityTypeAsync(int id, ActivityTypeRequestDto dto)
         {
-            if (id <= 0) throw new BadRequestException("Invalid ActivityType ID.");
-            if (string.IsNullOrWhiteSpace(dto.ActivityName)) throw new BadRequestException("ActivityType name is required.");
+          
             var type = await _typeRepo.GetByIdAsync(id);
             if (type == null) throw new NotFoundException("ActivityType not found.");
             type.Name = dto.ActivityName;
@@ -171,7 +154,6 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task DeleteActivityTypeAsync(int id)
         {
-            if (id <= 0) throw new BadRequestException("Invalid ActivityType ID.");
             var type = await _typeRepo.GetByIdAsync(id);
             if (type == null) throw new NotFoundException("ActivityType not found.");
             var hasActivities = await _activityRepo.GetAllAsync().ContinueWith(t => t.Result.Any(a => a.ActivityTypeId == id));
@@ -182,11 +164,13 @@ namespace ICEDT.API.Services.Implementation
         // Mapping helpers
         private ActivityResponseDto MapToActivityResponseDto(Activity activity)
         {
+          
             return new ActivityResponseDto
             {
                 ActivityId = activity.ActivityId,
                 LessonId = activity.LessonId,
                 ActivityTypeId = activity.ActivityTypeId,
+                MainActivityTypeId = activity.ActivityType != null ? activity.ActivityType.MainActivityTypeId : 0,
                 Title = activity.Title,
                 SequenceOrder = activity.SequenceOrder,
                 ContentJson = activity.ContentJson
@@ -198,7 +182,8 @@ namespace ICEDT.API.Services.Implementation
             return new ActivityTypeResponseDto
             {
                 ActivityTypeId = type.ActivityTypeId,
-                ActivityName = type.Name
+                ActivityName = type.Name,
+                MainActivityTypeId = type.MainActivityTypeId
             };
         }
     }

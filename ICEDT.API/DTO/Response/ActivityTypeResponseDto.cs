@@ -4,5 +4,6 @@ namespace ICEDT.API.DTO.Response
     {
         public int ActivityTypeId { get; set; }
         public string ActivityName { get; set; }
+        public int MainActivityTypeId { get; set; }
     }
 } 

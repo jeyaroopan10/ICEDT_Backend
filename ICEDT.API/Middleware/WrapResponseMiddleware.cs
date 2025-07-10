@@ -1,7 +1,12 @@
-﻿using System.Text.Json;
+﻿using Microsoft.AspNetCore.Http;
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using System.Security.Authentication;
+using Amazon.S3;
 
 namespace ICEDT.API.Middleware
 {
@@ -26,7 +31,7 @@ namespace ICEDT.API.Middleware
                 await _next(context);
 
                 if (context.Response.StatusCode == 404)
-                    throw new ArgumentException("The URL is not specified or invalid.");
+                    throw new NotFoundException("The URL is not specified or invalid.");
             }
             catch (Exception ex)
             {
@@ -82,7 +87,7 @@ namespace ICEDT.API.Middleware
                     exception.GetType().Name,
                     StatusCodes.Status400BadRequest
                 ),
-                ArgumentException => (
+                NotFoundException => (
                     exception.Message,
                     exception.GetType().Name,
                     StatusCodes.Status404NotFound
@@ -91,11 +96,6 @@ namespace ICEDT.API.Middleware
                     exception.Message,
                     exception.GetType().Name,
                     StatusCodes.Status400BadRequest
-                ),
-                NotFoundException => (
-                    exception.Message,
-                    exception.GetType().Name,
-                    StatusCodes.Status404NotFound
                 ),
                 ConflictException => (
                     exception.Message,
@@ -111,6 +111,16 @@ namespace ICEDT.API.Middleware
                     "A database update error occurred.",
                     "DbUpdateException",
                     StatusCodes.Status400BadRequest
+                ),
+                AmazonS3Exception s3Ex when s3Ex.Message.Contains("not authorized") => (
+                    s3Ex.Message,
+                    "AmazonS3Exception",
+                    StatusCodes.Status403Forbidden
+                ),
+                AmazonS3Exception s3Ex => (
+                    $"S3 error: {s3Ex.Message}",
+                    "AmazonS3Exception",
+                    StatusCodes.Status500InternalServerError
                 ),
                 _ => (
                     exception.Message ?? "An error occurred while processing your request.",
@@ -141,6 +151,7 @@ namespace ICEDT.API.Middleware
             await context.Response.WriteAsync(wrappedResponseBody);
         }
 
+
         private bool IsFileType(string? contentType)
         {
             if (string.IsNullOrEmpty(contentType))
@@ -157,10 +168,6 @@ namespace ICEDT.API.Middleware
             return fileTypes.Contains(contentType);
         }
     }
-
-
-
-
     public static class WrapResponseMiddlewareExtensions
     {
         public static IApplicationBuilder UseWrapResponseMiddleware(this IApplicationBuilder builder)

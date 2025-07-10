@@ -29,9 +29,6 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task<LevelResponseDto> AddLevelAsync(LevelRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.LevelName)) throw new BadRequestException("Level name is required.");
-            if (dto.SequenceOrder <= 0) throw new BadRequestException("Sequence order must be a positive number.");
-
             if (await _repo.SequenceOrderExistsAsync(dto.SequenceOrder))
                 throw new BadRequestException($"Sequence order {dto.SequenceOrder} is already in use.");
 
@@ -59,9 +56,6 @@ namespace ICEDT.API.Services.Implementation
         public async Task UpdateLevelAsync(int id, LevelRequestDto dto)
         {
             if (id <= 0) throw new BadRequestException("Invalid Level ID.");
-            if (string.IsNullOrWhiteSpace(dto.LevelName)) throw new BadRequestException("Level name is required.");
-            if (dto.SequenceOrder <= 0) throw new BadRequestException("Sequence order must be a positive number.");
-
             var level = await _repo.GetByIdAsync(id);
             if (level == null) throw new NotFoundException("Level not found.");
 
@@ -94,7 +88,7 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task DeleteLevelAsync(int id)
         {
-            if (id <= 0) throw new BadRequestException("Invalid Level ID.");
+           
             var level = await _repo.GetByIdAsync(id);
             if (level == null) throw new NotFoundException("Level not found.");
             await _repo.DeleteAsync(id);
@@ -102,8 +96,7 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task<LessonResponseDto> AddLessonToLevelAsync(int levelId, LessonRequestDto dto)
         {
-            if (levelId <= 0) throw new BadRequestException("Invalid Level ID.");
-            if (string.IsNullOrWhiteSpace(dto.LessonName)) throw new BadRequestException("Lesson name is required.");
+         
             var level = await _repo.GetByIdWithLessonsAsync(levelId);
             if (level == null) throw new NotFoundException("Level not found.");
 
@@ -137,7 +130,7 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task RemoveLessonFromLevelAsync(int levelId, int lessonId)
         {
-            if (levelId <= 0 || lessonId <= 0) throw new BadRequestException("Invalid IDs.");
+            
             var level = await _repo.GetByIdWithLessonsAsync(levelId);
             if (level == null) throw new NotFoundException("Level not found.");
             var lesson = level.Lessons?.FirstOrDefault(l => l.LessonId == lessonId);
@@ -148,7 +141,7 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task<LevelWithLessonsResponseDto> GetLevelWithLessonsAsync(int levelId)
         {
-            if (levelId <= 0) throw new BadRequestException("Invalid Level ID.");
+           
             var level = await _repo.GetByIdWithLessonsAsync(levelId);
             if (level == null) throw new NotFoundException("Level not found.");
             return new LevelWithLessonsResponseDto

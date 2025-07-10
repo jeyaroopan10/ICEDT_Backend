@@ -40,6 +40,9 @@ namespace ICEDT.API.Migrations
                     b.Property<int>("LessonId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MainActivityTypeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SequenceOrder")
                         .HasColumnType("int");
 
@@ -53,6 +56,8 @@ namespace ICEDT.API.Migrations
 
                     b.HasIndex("LessonId");
 
+                    b.HasIndex("MainActivityTypeId");
+
                     b.ToTable("Activities");
                 });
 
@@ -64,11 +69,16 @@ namespace ICEDT.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ActivityTypeId"));
 
+                    b.Property<int>("MainActivityTypeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ActivityTypeId");
+
+                    b.HasIndex("MainActivityTypeId");
 
                     b.ToTable("ActivityTypes");
                 });
@@ -199,6 +209,23 @@ namespace ICEDT.API.Migrations
                     b.HasKey("LevelId");
 
                     b.ToTable("Levels");
+                });
+
+            modelBuilder.Entity("ICEDT.API.Models.MainActivityType", b =>
+                {
+                    b.Property<int>("MainActivityTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MainActivityTypeId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("MainActivityTypeId");
+
+                    b.ToTable("MainActivityTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -348,9 +375,24 @@ namespace ICEDT.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ICEDT.API.Models.MainActivityType", null)
+                        .WithMany("Activities")
+                        .HasForeignKey("MainActivityTypeId");
+
                     b.Navigation("ActivityType");
 
                     b.Navigation("Lesson");
+                });
+
+            modelBuilder.Entity("ICEDT.API.Models.ActivityType", b =>
+                {
+                    b.HasOne("ICEDT.API.Models.MainActivityType", "MainActivityType")
+                        .WithMany("ActivityTypes")
+                        .HasForeignKey("MainActivityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MainActivityType");
                 });
 
             modelBuilder.Entity("ICEDT.API.Models.Lesson", b =>
@@ -428,6 +470,13 @@ namespace ICEDT.API.Migrations
             modelBuilder.Entity("ICEDT.API.Models.Level", b =>
                 {
                     b.Navigation("Lessons");
+                });
+
+            modelBuilder.Entity("ICEDT.API.Models.MainActivityType", b =>
+                {
+                    b.Navigation("Activities");
+
+                    b.Navigation("ActivityTypes");
                 });
 #pragma warning restore 612, 618
         }

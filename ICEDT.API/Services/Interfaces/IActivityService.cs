@@ -10,7 +10,7 @@ namespace ICEDT.API.Services.Interfaces
         // Activity
         Task<ActivityResponseDto> GetActivityAsync(int id);
         Task<List<ActivityResponseDto>> GetAllActivitiesAsync();
-        Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId);
+        Task<List<ActivityResponseDto>> GetActivitiesByLessonIdAsync(int lessonId, int? activitytypeid, int? mainactivitytypeid);
         Task<ActivityResponseDto> AddActivityAsync(ActivityRequestDto dto);
         Task UpdateActivityAsync(int id, ActivityRequestDto dto);
         Task DeleteActivityAsync(int id);
