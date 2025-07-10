@@ -12,5 +12,6 @@ namespace ICEDT.API.Services.Interfaces
         Task DeleteAsync(string key);
         Task<MediaListResponseDto> ListAsync(string folder);
         Task<MediaUrlResponseDto> GetPresignedUrlAsync(MediaUrlRequestDto request);
+        Task<string> GetPublicUrlAsync(string key);
     }
 } 

@@ -54,5 +54,16 @@ namespace ICEDT.API.Controllers
             var result = await _mediaService.GetPresignedUrlAsync(request);
             return Ok(result);
         }
+
+        [HttpGet("public-url")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetPublicUrl([FromQuery] string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                return BadRequest(new { message = "Key is required." });
+
+            var url = await _mediaService.GetPublicUrlAsync(key);
+            return Ok(new { url });
+        }
     }
 }

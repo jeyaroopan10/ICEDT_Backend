@@ -209,6 +209,16 @@ namespace ICEDT.API.Services.Implementation
             }
         }
 
+        public Task<string> GetPublicUrlAsync(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new BadRequestException("Key cannot be empty");
+
+            var region = _configuration.GetSection("AWS")["Region"];
+            var url = $"https://{_bucketName}.s3.{region}.amazonaws.com/{key}";
+            return Task.FromResult(url);
+        }
+
         // Dispose method for cleanup
         public void Dispose()
         {
