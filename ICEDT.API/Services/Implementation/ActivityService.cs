@@ -138,7 +138,7 @@ namespace ICEDT.API.Services.Implementation
 
         public async Task<ActivityTypeResponseDto> AddActivityTypeAsync(ActivityTypeRequestDto dto)
         {
-            var type = new ActivityType { Name = dto.ActivityName };
+            var type = new ActivityType { Name = dto.ActivityName, MainActivityTypeId = dto.MainActivityTypeId };
             await _typeRepo.AddAsync(type);
             return MapToActivityTypeResponseDto(type);
         }
