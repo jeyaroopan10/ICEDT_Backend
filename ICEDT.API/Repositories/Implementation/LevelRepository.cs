@@ -9,9 +9,9 @@ namespace ICEDT.API.Repositories.Implementation
 {
     public class LevelRepository : ILevelRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
 
-        public LevelRepository(ApplicationDbContext context) => _context = context;
+        public LevelRepository(IApplicationDbContext context) => _context = context;
 
         public async Task<Level> GetByIdAsync(int id) =>
             await _context.Levels

@@ -7,8 +7,18 @@ namespace ICEDT.API.Extensions
     {
         public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            var useSqlite = configuration.GetValue<bool>("UseSqlite");
+            if (useSqlite)
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlite(configuration.GetConnectionString("SqliteConnection")));
+            }
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            }
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
             return services;
         }
     }

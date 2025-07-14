@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ICEDT.API.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>, IApplicationDbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -18,5 +18,9 @@ namespace ICEDT.API.Data
         public DbSet<ActivityType> ActivityTypes { get; set; }
         public DbSet<MainActivityType> MainActivityTypes { get; set; }
 
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return base.SaveChangesAsync(cancellationToken);
+        }
     }
 }

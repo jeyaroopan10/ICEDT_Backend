@@ -7,9 +7,9 @@ namespace ICEDT.API.Repositories.Implementation
 {
     public class ActivityTypeRepository : IActivityTypeRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IApplicationDbContext _context;
 
-        public ActivityTypeRepository(ApplicationDbContext context) => _context = context;
+        public ActivityTypeRepository(IApplicationDbContext context) => _context = context;
 
         public async Task<ActivityType> GetByIdAsync(int id) =>
             await _context.ActivityTypes.FindAsync(id);
